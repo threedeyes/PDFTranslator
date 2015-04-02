@@ -127,17 +127,13 @@ PDFLoader::PDFLoader(BPositionIO *source)
     //stream->meta = stream_meta;
         
 	if (signatureData == kPDFMagic) {
-    	printf("PDF\n");
 		fDocumentType = PDF_IMAGE_FORMAT;
     	doc = fz_open_document_with_stream(ctx, "magic.pdf", stream);
-    	//doc = fz_open_document(ctx, "/boot/home/Project/PDF/test/1/2.pdf");
 	} else {
-		printf("Is not PDF!\n");
     	return;    
 	}
 
 	fPageCount = fz_count_pages(doc);
-	printf("fPageCount %d\n", fPageCount);
 	
 	fLoaded = true;	
 }

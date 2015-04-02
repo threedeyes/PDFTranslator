@@ -35,10 +35,6 @@ const char *kDocumentIndex = "/documentIndex";
 #define kPDFMimeType "application/pdf"
 #define kPDFName "PDF Document"
 
-#define kXPSMimeType "application/vnd.ms-xpsdocument"
-#define kXPSName "XML Paper Specification"
-
-
 static const translation_format sInputFormats[] = {
 	{
 		PDF_IMAGE_FORMAT,
@@ -47,14 +43,6 @@ static const translation_format sInputFormats[] = {
 		PDF_IN_CAPABILITY,
 		kPDFMimeType,
 		kPDFName
-	},
-	{
-		XPS_IMAGE_FORMAT,
-		B_TRANSLATOR_BITMAP,
-		XPS_IN_QUALITY,
-		XPS_IN_CAPABILITY,
-		kXPSMimeType,
-		kXPSName
 	},
 };
 
@@ -84,8 +72,8 @@ const uint32 kNumDefaultSettings = sizeof(sDefaultSettings)
 
 
 PDFTranslator::PDFTranslator()
-	: BaseTranslator("PDF/XPS Document",
-		"PDF/XPS Document translator",
+	: BaseTranslator("PDF Document",
+		"PDF Document translator",
 		PDF_TRANSLATOR_VERSION,
 		sInputFormats, kNumInputFormats,
 		sOutputFormats, kNumOutputFormats,
@@ -109,22 +97,19 @@ PDFTranslator::DerivedIdentify(BPositionIO *stream,
 	if (outType != B_TRANSLATOR_BITMAP)
 		return B_NO_TRANSLATOR;
 		
-//	uint32 signatureData;
-//	ssize_t signatureSize = 4;
-//	if (stream->Read(&signatureData, signatureSize) != signatureSize)
-//		return B_IO_ERROR;
+	uint32 signatureData;
+	ssize_t signatureSize = 4;
+	if (stream->Read(&signatureData, signatureSize) != signatureSize)
+		return B_IO_ERROR;
 			
-//	const uint32 kPDFMagic = B_HOST_TO_BENDIAN_INT32('%PDF');
+	const uint32 kPDFMagic = B_HOST_TO_BENDIAN_INT32('%PDF');
 	
-//	if (signatureData != kPDFMagic)
-//		return B_ILLEGAL_DATA;
+	if (signatureData != kPDFMagic)
+		return B_ILLEGAL_DATA;
 	
-//	printf("sig ok\n");
 		
 	PDFLoader PDFFile(stream);
-	
-	printf("loaded %s\n", PDFFile.IsLoaded()?"true":"false");
-	
+		
 	if(!PDFFile.IsLoaded() || PDFFile.PageCount() <= 0 || PDFFile.DocumentType() < 0)
 		return B_ILLEGAL_DATA;
 
@@ -149,21 +134,12 @@ PDFTranslator::DerivedIdentify(BPositionIO *stream,
 		info->quality = PDF_IN_QUALITY;
 		info->capability = PDF_IN_CAPABILITY;
 		BString docName("PDF Page");
-		docName << " #" << documentIndex;
+		docName << " " << documentIndex << "/" << documentCount;
 		
 		snprintf(info->name, sizeof(info->name), docName.String());
 		strcpy(info->MIME, kPDFMimeType);
-	} else if (PDFFile.DocumentType() == XPS_IMAGE_FORMAT) {
-		info->type = XPS_IMAGE_FORMAT;
-		info->group = B_TRANSLATOR_BITMAP;
-		info->quality = XPS_IN_QUALITY;
-		info->capability = XPS_IN_CAPABILITY;
-		BString docName("XPS Page");
-		docName << " #" << documentIndex;
-		
-		snprintf(info->name, sizeof(info->name), docName.String());
-		strcpy(info->MIME, kXPSMimeType);
 	}
+	
 	return B_OK;
 }
 
