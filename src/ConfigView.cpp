@@ -68,7 +68,7 @@ ConfigView::ConfigView(TranslatorSettings *settings)
 	AddChild(BSpaceLayoutItem::CreateVerticalStrut(spacing));
 	
 	BString copyrightText;
-	copyrightText << "Based on muPDF 1.6\n";
+	copyrightText << "Based on MuPDF 1.6\n";
 		
 	fCopyrightView = new BTextView("CopyrightLibs");
 	fCopyrightView->SetExplicitAlignment(leftAlignment);
