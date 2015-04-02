@@ -34,6 +34,7 @@
 #include <DataIO.h>
 #include <File.h>
 #include <ByteOrder.h>
+#include <String.h>
 
 #define DOCUMENT_COUNT "/documentCount"
 #define DOCUMENT_INDEX "/documentIndex"

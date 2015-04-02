@@ -20,7 +20,7 @@ OBJS	:= $(addprefix $(OBJDIR)/,$(OBJS))
 CC := g++
 LD := $(CC)
 
-LIBS := -lbe -ltranslation -lroot -lz -lfreetype -ljpeg -ljbig2dec -lopenjp2 -lssl -lcrypto -lmupdf
+LIBS := -lbe -ltranslation -lmupdf
 CFLAGS := -O3 -I./src -I./src/shared 
 LDFLAGS := 
 
