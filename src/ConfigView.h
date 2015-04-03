@@ -27,8 +27,15 @@
 #include <String.h>
 #include <GroupView.h>
 #include <CheckBox.h>
+#include <MenuField.h>
+#include <MenuItem.h>
+#include <PopUpMenu.h>
+#include <StringView.h>
+#include <SpaceLayoutItem.h>
+#include <ControlLook.h>
 
-#define PSD_SETTING_LAYERS_DECODE "pdf /layers_decode"
+#define MSG_DPI_CHANGED 'dpic'
+#define MSG_ANTIALIASING_CHANGED 'aach'
 
 class ConfigView : public BGroupView {
 	public:
@@ -39,7 +46,13 @@ class ConfigView : public BGroupView {
 		virtual void MessageReceived(BMessage* message);
 
 	private:
+		void _AddItemToMenu(BMenu* menu, const char* label,
+			uint32 mess, uint32 value, uint32 current_value);
+	
 		BTextView*			fCopyrightView;
+		BMenuField*			fDPIField;
+		BMenuField*			fAntialiasingField;
+		
 		TranslatorSettings *fSettings;
 };
 

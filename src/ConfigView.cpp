@@ -20,17 +20,48 @@
 #include "ConfigView.h"
 #include "PDFTranslator.h"
 
-#include <StringView.h>
-#include <SpaceLayoutItem.h>
-#include <ControlLook.h>
-
 #include <stdio.h>
 
 
 ConfigView::ConfigView(TranslatorSettings *settings)
-	: BGroupView("PSDTranslator Settings", B_VERTICAL, 0)
+	: BGroupView("PDFTranslator Settings", B_VERTICAL, 0)
 {
 	fSettings = settings;
+	
+	BPopUpMenu* dpiPopupMenu = new BPopUpMenu("popup_dpi");
+
+	uint32 currentDPI = 
+		fSettings->SetGetInt32(PDF_SETTING_DPI);
+
+	_AddItemToMenu(dpiPopupMenu, "36",
+		MSG_DPI_CHANGED, 36, currentDPI);
+	_AddItemToMenu(dpiPopupMenu, "72",
+		MSG_DPI_CHANGED, 72, currentDPI);
+	_AddItemToMenu(dpiPopupMenu, "96",
+		MSG_DPI_CHANGED, 96, currentDPI);
+	_AddItemToMenu(dpiPopupMenu, "120",
+		MSG_DPI_CHANGED, 120, currentDPI);
+	_AddItemToMenu(dpiPopupMenu, "240",
+		MSG_DPI_CHANGED, 240, currentDPI);
+	_AddItemToMenu(dpiPopupMenu, "320",
+		MSG_DPI_CHANGED, 320, currentDPI);
+		
+	fDPIField = new BMenuField("dpi", "DPI: ", dpiPopupMenu);
+
+	
+	BPopUpMenu* antialiasingPopupMenu = new BPopUpMenu("popup_antialiasing");
+
+	uint32 currentAntialiasing = 
+		fSettings->SetGetInt32(PDF_SETTING_ANTIALIASING);
+
+	for (int i = 0; i <= 8; i++) {
+		BString val;
+		val << i;
+		_AddItemToMenu(antialiasingPopupMenu, val.String(),
+			MSG_ANTIALIASING_CHANGED, i, currentAntialiasing);
+	}
+
+	fAntialiasingField = new BMenuField("antialiasing", "Antialiasing bits: ", antialiasingPopupMenu);
 
 	BAlignment leftAlignment(B_ALIGN_LEFT, B_ALIGN_VERTICAL_UNSET);
 
@@ -61,6 +92,11 @@ ConfigView::ConfigView(TranslatorSettings *settings)
 		B_UTF8_COPYRIGHT "2012-2015 Gerasim Troeglazov <3dEyes@gmail.com>");
 	stringView->SetExplicitAlignment(leftAlignment);
 	AddChild(stringView);
+	
+	AddChild(BSpaceLayoutItem::CreateVerticalStrut(spacing));
+
+	AddChild(fDPIField);
+	AddChild(fAntialiasingField);
 
 	AddChild(BSpaceLayoutItem::CreateVerticalStrut(spacing));
 	
@@ -99,7 +135,9 @@ ConfigView::~ConfigView()
 
 void
 ConfigView::AllAttached()
-{	
+{
+	fDPIField->Menu()->SetTargetForItems(this);
+	fAntialiasingField->Menu()->SetTargetForItems(this);
 }
 
 
@@ -107,7 +145,35 @@ void
 ConfigView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case MSG_DPI_CHANGED: {
+			int32 value;
+			if (message->FindInt32("value", &value) >= B_OK) {
+				fSettings->SetGetInt32(PDF_SETTING_DPI, &value);
+				fSettings->SaveSettings();
+			}
+			break;
+		}
+		case MSG_ANTIALIASING_CHANGED: {
+			int32 value;
+			if (message->FindInt32("value", &value) >= B_OK) {
+				fSettings->SetGetInt32(PDF_SETTING_ANTIALIASING, &value);
+				fSettings->SaveSettings();
+			}
+			break;
+		}		
 		default:
 			BView::MessageReceived(message);
 	}
+}
+
+
+void
+ConfigView::_AddItemToMenu(BMenu* menu, const char* label,
+	uint32 mess, uint32 value, uint32 current_value)
+{
+	BMessage* message = new BMessage(mess);
+	message->AddInt32("value", value);
+	BMenuItem* item = new BMenuItem(label, message);
+	item->SetMarked(value == current_value);
+	menu->AddItem(item);
 }

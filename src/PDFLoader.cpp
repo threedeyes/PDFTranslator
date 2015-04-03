@@ -27,7 +27,6 @@ struct istream_filter {
 
 static int next_istream(fz_stream *stm, int max)
 {
-	printf("next_istream\n");
     istream_filter *state = (istream_filter *)stm->state;
     int cbRead = sizeof(state->buf);        
     
@@ -37,8 +36,6 @@ static int next_istream(fz_stream *stm, int max)
     stm->rp = state->buf;
     stm->wp = stm->rp + cbRead;
     stm->pos += cbRead;
-    
-    printf("next_istream: cbRead=%d stm->pos=%d\n", cbRead, stm->pos);
 
     return cbRead > 0 ? *stm->rp++ : EOF;
 }
@@ -46,7 +43,6 @@ static int next_istream(fz_stream *stm, int max)
 static void seek_istream(fz_stream *stm, int offset, int whence)
 {
     istream_filter *state = (istream_filter *)stm->state;
-    printf("seek_istream offset=%d\n",offset);
     state->stream->Seek(offset, whence);
   	  	
     stm->pos = state->stream->Position();
@@ -79,7 +75,6 @@ stream_meta(fz_stream *stream, int key, int size, void *ptr)
 			source->Seek(0, SEEK_END);
 			size_t iosize = source->Position();
 			source->Seek(pos, SEEK_SET);
-			printf("FZ_STREAM_META_LENGTH: %ld\n", iosize);
 			return iosize;
 	    }
 	    case FZ_STREAM_META_PROGRESSIVE:
@@ -94,7 +89,9 @@ PDFLoader::PDFLoader(BPositionIO *source)
 	fLoaded = false;
 	fDocumentType = 0;	
 	fPageCount = 0;
-	
+	fDPI = 72;
+	fAntialiasingBits = 8;
+
 	doc = NULL;
 	ctx = NULL;
 	stream = NULL;
@@ -152,16 +149,32 @@ PDFLoader::IsLoaded(void)
 	return fLoaded;
 }
 
+
 uint32
 PDFLoader::DocumentType(void)
 {
 	return fDocumentType;
 }	
 	
+
 int
 PDFLoader::PageCount(void)
 {
 	return fPageCount;
+}
+
+
+void
+PDFLoader::SetDPI(uint32 dpi)
+{
+	fDPI = dpi;
+}
+
+
+void
+PDFLoader::SetAntialiasingBits(uint32 bits)
+{
+	fAntialiasingBits = bits;
 }
 
 
@@ -171,14 +184,15 @@ PDFLoader::GetImage(BPositionIO *target, int index)
 	if (index < 1 || index > fPageCount + 1 || !fLoaded)
 		return B_NO_TRANSLATOR;
 
-	int zoom = 100;
 	int rotation = 0;
 
 	fz_page *page = fz_load_page(doc, index - 1);
 	
 	fz_matrix transform;
 	fz_rotate(&transform, rotation);
-	fz_pre_scale(&transform, zoom / 100.0f, zoom / 100.0f);
+	fz_pre_scale(&transform, fDPI / 72.0f, fDPI / 72.0f);
+	
+	fz_set_aa_level(ctx, fAntialiasingBits);
 
 	fz_rect bounds;
 	fz_bound_page(doc, page, &bounds);
@@ -190,6 +204,8 @@ PDFLoader::GetImage(BPositionIO *target, int index)
 	fz_clear_pixmap_with_value(ctx, pix, 0xff);
 
 	fz_device *dev = fz_new_draw_device(ctx, pix);
+	if (fAntialiasingBits == 0)
+		fz_enable_device_hints(dev, FZ_DONT_INTERPOLATE_IMAGES);
 	fz_run_page(doc, page, dev, &transform, NULL);
 	fz_free_device(dev);	
 

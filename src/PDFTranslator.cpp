@@ -57,7 +57,9 @@ static const translation_format sOutputFormats[] = {
 
 static const TranSetting sDefaultSettings[] = {
 	{B_TRANSLATOR_EXT_HEADER_ONLY, TRAN_SETTING_BOOL, false},
-	{B_TRANSLATOR_EXT_DATA_ONLY, TRAN_SETTING_BOOL, false}
+	{B_TRANSLATOR_EXT_DATA_ONLY, TRAN_SETTING_BOOL, false},
+	{PDF_SETTING_DPI, TRAN_SETTING_INT32, 72},
+	{PDF_SETTING_ANTIALIASING, TRAN_SETTING_INT32, 8}
 };
 
 const uint32 kNumInputFormats = sizeof(sInputFormats)
@@ -158,6 +160,9 @@ PDFTranslator::DerivedTranslate(BPositionIO *source,
 			PDFLoader PDFFile(source);
 			if (!PDFFile.IsLoaded() || PDFFile.PageCount() <= 0)
 				return B_NO_TRANSLATOR;
+
+			PDFFile.SetDPI(fSettings->SetGetInt32(PDF_SETTING_DPI));
+			PDFFile.SetAntialiasingBits(fSettings->SetGetInt32(PDF_SETTING_ANTIALIASING));
 
 			int32 documentIndex = 1;
 

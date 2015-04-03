@@ -45,11 +45,13 @@ class PDFLoader {
 public:
 					PDFLoader(BPositionIO *source);
 					~PDFLoader();
-		
+
 	int				PageCount(void);
 	int 			GetImage(BPositionIO *target, int index);
 	bool			IsLoaded(void);
 	uint32			DocumentType(void);
+	void			SetDPI(uint32 dpi);
+	void 			SetAntialiasingBits(uint32 bits);
 private:
 	fz_context 		*ctx;
 	fz_document 	*doc;
@@ -57,7 +59,10 @@ private:
 	
 	uint32			fDocumentType;
 	int				fPageCount;
-	bool			fLoaded;	
+	bool			fLoaded;
+	
+	uint32			fDPI;
+	uint32			fAntialiasingBits;
 };
 
 
