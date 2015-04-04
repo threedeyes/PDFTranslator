@@ -83,11 +83,6 @@ ConfigView::ConfigView(TranslatorSettings *settings)
 	stringView->SetExplicitAlignment(leftAlignment);
 	AddChild(stringView);
 
-	stringView = new BStringView("copyright",
-		B_UTF8_COPYRIGHT "2005-2015 Haiku Inc.");
-	stringView->SetExplicitAlignment(leftAlignment);
-	AddChild(stringView);
-
 	stringView = new BStringView("my_copyright",
 		B_UTF8_COPYRIGHT "2012-2015 Gerasim Troeglazov <3dEyes@gmail.com>");
 	stringView->SetExplicitAlignment(leftAlignment);
@@ -101,7 +96,13 @@ ConfigView::ConfigView(TranslatorSettings *settings)
 	AddChild(BSpaceLayoutItem::CreateVerticalStrut(spacing));
 	
 	BString copyrightText;
-	copyrightText << "Based on MuPDF 1.6\n";
+	copyrightText << "\nBased on MuPDF 1.6\n\n"
+	"MuPDF is free software: you can redistribute it and/or "
+	"modify it under the terms of the Affero GNU General Pub"
+	"lic License as published by the Free Software Foundatio"
+	"n, either version 3 of the License, or (at your option)"
+	" any later version.\n\n"
+	"MuPDF is Copyright 2006-2013 Artifex Software, Inc.";
 		
 	fCopyrightView = new BTextView("CopyrightLibs");
 	fCopyrightView->SetExplicitAlignment(leftAlignment);
