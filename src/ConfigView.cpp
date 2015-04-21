@@ -96,13 +96,13 @@ ConfigView::ConfigView(TranslatorSettings *settings)
 	AddChild(BSpaceLayoutItem::CreateVerticalStrut(spacing));
 	
 	BString copyrightText;
-	copyrightText << "\nBased on MuPDF 1.6\n\n"
+	copyrightText << "\nBased on MuPDF 1.7\n\n"
 	"MuPDF is free software: you can redistribute it and/or "
 	"modify it under the terms of the Affero GNU General Pub"
 	"lic License as published by the Free Software Foundatio"
 	"n, either version 3 of the License, or (at your option)"
 	" any later version.\n\n"
-	"MuPDF is Copyright 2006-2013 Artifex Software, Inc.";
+	"MuPDF is Copyright 2006-2015 Artifex Software, Inc.";
 		
 	fCopyrightView = new BTextView("CopyrightLibs");
 	fCopyrightView->SetExplicitAlignment(leftAlignment);

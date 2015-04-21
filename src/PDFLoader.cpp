@@ -25,7 +25,7 @@ struct istream_filter {
     unsigned char buf[4096];
 };
 
-static int next_istream(fz_stream *stm, int max)
+static int next_istream(fz_context *ctx, fz_stream *stm, int max)
 {
     istream_filter *state = (istream_filter *)stm->state;
     int cbRead = sizeof(state->buf);        
@@ -40,7 +40,7 @@ static int next_istream(fz_stream *stm, int max)
     return cbRead > 0 ? *stm->rp++ : EOF;
 }
 
-static void seek_istream(fz_stream *stm, int offset, int whence)
+static void seek_istream(fz_context *ctx, fz_stream *stm, int offset, int whence)
 {
     istream_filter *state = (istream_filter *)stm->state;
     state->stream->Seek(offset, whence);
@@ -112,7 +112,7 @@ PDFLoader::PDFLoader(BPositionIO *source)
 	istream_filter *state = fz_malloc_struct(ctx, istream_filter);
     state->stream = source;
         
-    stream = fz_new_stream(ctx, state, next_istream, close_istream, NULL);
+    stream = fz_new_stream(ctx, state, next_istream, close_istream);
     
     fz_register_document_handlers(ctx);
     
@@ -121,12 +121,12 @@ PDFLoader::PDFLoader(BPositionIO *source)
         
 	if (signatureData == kPDFMagic) {
 		fDocumentType = PDF_IMAGE_FORMAT;
-    	doc = fz_open_document_with_stream(ctx, "magic.pdf", stream);
+    	doc = fz_open_document_with_stream(ctx, "mupdf.pdf", stream);
 	} else {
     	return;    
 	}
 
-	fPageCount = fz_count_pages(doc);
+	fPageCount = fz_count_pages(ctx, doc);
 	
 	fLoaded = true;	
 }
@@ -135,11 +135,11 @@ PDFLoader::PDFLoader(BPositionIO *source)
 PDFLoader::~PDFLoader()
 {
 	if(doc!=NULL)
-		fz_close_document(doc);
+		fz_drop_document(ctx, doc);
 	if(stream!=NULL)
-		fz_close(stream);	
+		fz_drop_stream(ctx, stream);
 	if(ctx!=NULL)
-		fz_free_context(ctx);
+		fz_drop_context(ctx);
 }
 
 
@@ -186,7 +186,7 @@ PDFLoader::GetImage(BPositionIO *target, int index)
 
 	int rotation = 0;
 
-	fz_page *page = fz_load_page(doc, index - 1);
+	fz_page *page = fz_load_page(ctx, doc, index - 1);
 	
 	fz_matrix transform;
 	fz_rotate(&transform, rotation);
@@ -195,7 +195,7 @@ PDFLoader::GetImage(BPositionIO *target, int index)
 	fz_set_aa_level(ctx, fAntialiasingBits);
 
 	fz_rect bounds;
-	fz_bound_page(doc, page, &bounds);
+	fz_bound_page(ctx, page, &bounds);
 	fz_transform_rect(&bounds, &transform);
 
 	fz_irect bbox;
@@ -205,9 +205,9 @@ PDFLoader::GetImage(BPositionIO *target, int index)
 
 	fz_device *dev = fz_new_draw_device(ctx, pix);
 	if (fAntialiasingBits == 0)
-		fz_enable_device_hints(dev, FZ_DONT_INTERPOLATE_IMAGES);
-	fz_run_page(doc, page, dev, &transform, NULL);
-	fz_free_device(dev);	
+		fz_enable_device_hints(ctx, dev, FZ_DONT_INTERPOLATE_IMAGES);
+	fz_run_page(ctx, page, dev, &transform, NULL);
+	fz_drop_device(ctx, dev);
 
 	TranslatorBitmap bitsHeader;
 	bitsHeader.magic = B_TRANSLATOR_BITMAP;
@@ -236,7 +236,7 @@ PDFLoader::GetImage(BPositionIO *target, int index)
 	}
 
 	fz_drop_pixmap(ctx, pix);
-	fz_free_page(doc, page);	
+	fz_drop_page(ctx, page);
 
 	return B_OK;
 }

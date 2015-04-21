@@ -132,10 +132,7 @@ PDFTranslator::DerivedIdentify(BPositionIO *stream,
 		info->group = B_TRANSLATOR_BITMAP;
 		info->quality = PDF_IN_QUALITY;
 		info->capability = PDF_IN_CAPABILITY;
-		BString docName("PDF Page");
-		docName << " " << documentIndex << "/" << documentCount;
-		
-		snprintf(info->name, sizeof(info->name), docName.String());
+		strcpy(info->name, "PDF Document");
 		strcpy(info->MIME, kPDFMimeType);
 	}
 	
