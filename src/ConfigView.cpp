@@ -22,6 +22,10 @@
 
 #include <stdio.h>
 
+extern "C" {
+#include <mupdf/fitz.h>
+};
+
 
 ConfigView::ConfigView(TranslatorSettings *settings)
 	: BGroupView("PDFTranslator Settings", B_VERTICAL, 0)
@@ -96,7 +100,7 @@ ConfigView::ConfigView(TranslatorSettings *settings)
 	AddChild(BSpaceLayoutItem::CreateVerticalStrut(spacing));
 	
 	BString copyrightText;
-	copyrightText << "\nBased on MuPDF 1.7\n\n"
+	copyrightText << "\nBased on MuPDF " << FZ_VERSION << "\n\n"
 	"MuPDF is free software: you can redistribute it and/or "
 	"modify it under the terms of the Affero GNU General Pub"
 	"lic License as published by the Free Software Foundatio"
