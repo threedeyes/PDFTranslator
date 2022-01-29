@@ -21,6 +21,7 @@
 #include "PDFTranslator.h"
 
 #include <Catalog.h>
+#include <LayoutBuilder.h>
 
 #include <stdio.h>
 
@@ -36,7 +37,7 @@ ConfigView::ConfigView(TranslatorSettings *settings)
 	: BGroupView("PDFTranslator Settings", B_VERTICAL, 0)
 {
 	fSettings = settings;
-	
+
 	BPopUpMenu* dpiPopupMenu = new BPopUpMenu("popup_dpi");
 
 	uint32 currentDPI = 
@@ -54,10 +55,10 @@ ConfigView::ConfigView(TranslatorSettings *settings)
 		MSG_DPI_CHANGED, 240, currentDPI);
 	_AddItemToMenu(dpiPopupMenu, "320",
 		MSG_DPI_CHANGED, 320, currentDPI);
-		
-	fDPIField = new BMenuField("dpi", B_TRANSLATE("DPI:"), dpiPopupMenu);
 
-	
+	fDPIField = new BMenuField("dpi", B_TRANSLATE("DPI:"), dpiPopupMenu);
+	fDPIField->SetAlignment(B_ALIGN_RIGHT);
+
 	BPopUpMenu* antialiasingPopupMenu = new BPopUpMenu("popup_antialiasing");
 
 	uint32 currentAntialiasing = 
@@ -72,16 +73,10 @@ ConfigView::ConfigView(TranslatorSettings *settings)
 
 	fAntialiasingField = new BMenuField("antialiasing", B_TRANSLATE("Antialiasing bits:"),
 		antialiasingPopupMenu);
-
-	BAlignment leftAlignment(B_ALIGN_LEFT, B_ALIGN_VERTICAL_UNSET);
+	fAntialiasingField->SetAlignment(B_ALIGN_RIGHT);
 
 	BStringView *stringView = new BStringView("title", B_TRANSLATE("PDF image translator"));
 	stringView->SetFont(be_bold_font);
-	stringView->SetExplicitAlignment(leftAlignment);
-	AddChild(stringView);
-
-	float spacing = be_control_look->DefaultItemSpacing();
-	AddChild(BSpaceLayoutItem::CreateVerticalStrut(spacing));
 
 	char version[256];
 	sprintf(version, "Version %d.%d.%d, %s",
@@ -89,21 +84,10 @@ ConfigView::ConfigView(TranslatorSettings *settings)
 		int(B_TRANSLATION_MINOR_VERSION(PDF_TRANSLATOR_VERSION)),
 		int(B_TRANSLATION_REVISION_VERSION(PDF_TRANSLATOR_VERSION)),
 		__DATE__);
-	stringView = new BStringView("version", version);
-	stringView->SetExplicitAlignment(leftAlignment);
-	AddChild(stringView);
+	BStringView *versionView = new BStringView("version", version);
 
-	stringView = new BStringView("my_copyright",
+	BStringView *copyrightView = new BStringView("my_copyright",
 		B_UTF8_COPYRIGHT "2012-2015 Gerasim Troeglazov <3dEyes@gmail.com>");
-	stringView->SetExplicitAlignment(leftAlignment);
-	AddChild(stringView);
-
-	AddChild(BSpaceLayoutItem::CreateVerticalStrut(spacing));
-
-	AddChild(fDPIField);
-	AddChild(fAntialiasingField);
-
-	AddChild(BSpaceLayoutItem::CreateVerticalStrut(spacing));
 
 	BString copyrightText(B_TRANSLATE("Based on MuPDF %fzversion%\n\n"
 	"MuPDF is free software: you can redistribute it and/or "
@@ -115,7 +99,6 @@ ConfigView::ConfigView(TranslatorSettings *settings)
 	copyrightText.ReplaceFirst("%fzversion%", FZ_VERSION);
 
 	fCopyrightView = new BTextView("CopyrightLibs");
-	fCopyrightView->SetExplicitAlignment(leftAlignment);
 	fCopyrightView->MakeEditable(false);
 	fCopyrightView->MakeResizable(true);
 	fCopyrightView->SetWordWrap(true);
@@ -126,15 +109,24 @@ ConfigView::ConfigView(TranslatorSettings *settings)
 	BFont font;
 	font.SetSize(font.Size() * 0.9);
 	fCopyrightView->SetFontAndColor(&font, B_FONT_SIZE, NULL);
-	AddChild(fCopyrightView);
 
-	fCopyrightView->SetExplicitAlignment(leftAlignment);
-
-	AddChild(BSpaceLayoutItem::CreateGlue());
-	GroupLayout()->SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING, 
-		B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING);
-
-	SetExplicitPreferredSize(GroupLayout()->MinSize());
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.SetInsets(B_USE_WINDOW_INSETS)
+		.Add(stringView)
+		.AddStrut(B_USE_DEFAULT_SPACING)
+		.Add(versionView)
+		.Add(copyrightView)
+		.AddStrut(B_USE_BIG_SPACING)
+		.AddGrid()
+			.Add(fDPIField->CreateLabelLayoutItem(), 0, 0)
+			.Add(fDPIField->CreateMenuBarLayoutItem(), 1, 0)
+			.AddGlue(2, 0, 2)
+			.Add(fAntialiasingField->CreateLabelLayoutItem(), 0, 1)
+			.Add(fAntialiasingField->CreateMenuBarLayoutItem(), 1, 1)
+			.AddGlue(2, 1, 2)
+			.End()
+		.AddGlue()
+		.Add(fCopyrightView);
 }
 
 
