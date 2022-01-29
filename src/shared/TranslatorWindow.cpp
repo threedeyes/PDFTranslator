@@ -29,13 +29,16 @@
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
 
-#include <Screen.h>
 #include <Alert.h>
+#include <Catalog.h>
 #include <GroupLayout.h>
+#include <Screen.h>
+
 #include "TranslatorWindow.h"
 
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "TranslatorWindow"
 
-#define B_TRANSLATE
 
 // ---------------------------------------------------------------
 // Constructor

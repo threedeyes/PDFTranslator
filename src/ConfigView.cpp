@@ -20,7 +20,12 @@
 #include "ConfigView.h"
 #include "PDFTranslator.h"
 
+#include <Catalog.h>
+
 #include <stdio.h>
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ConfigView"
 
 extern "C" {
 #include <mupdf/fitz.h>
@@ -50,7 +55,7 @@ ConfigView::ConfigView(TranslatorSettings *settings)
 	_AddItemToMenu(dpiPopupMenu, "320",
 		MSG_DPI_CHANGED, 320, currentDPI);
 		
-	fDPIField = new BMenuField("dpi", "DPI: ", dpiPopupMenu);
+	fDPIField = new BMenuField("dpi", B_TRANSLATE("DPI:"), dpiPopupMenu);
 
 	
 	BPopUpMenu* antialiasingPopupMenu = new BPopUpMenu("popup_antialiasing");
@@ -65,11 +70,12 @@ ConfigView::ConfigView(TranslatorSettings *settings)
 			MSG_ANTIALIASING_CHANGED, i, currentAntialiasing);
 	}
 
-	fAntialiasingField = new BMenuField("antialiasing", "Antialiasing bits: ", antialiasingPopupMenu);
+	fAntialiasingField = new BMenuField("antialiasing", B_TRANSLATE("Antialiasing bits:"),
+		antialiasingPopupMenu);
 
 	BAlignment leftAlignment(B_ALIGN_LEFT, B_ALIGN_VERTICAL_UNSET);
 
-	BStringView *stringView = new BStringView("title", "PDF image translator");
+	BStringView *stringView = new BStringView("title", B_TRANSLATE("PDF image translator"));
 	stringView->SetFont(be_bold_font);
 	stringView->SetExplicitAlignment(leftAlignment);
 	AddChild(stringView);
@@ -91,23 +97,23 @@ ConfigView::ConfigView(TranslatorSettings *settings)
 		B_UTF8_COPYRIGHT "2012-2015 Gerasim Troeglazov <3dEyes@gmail.com>");
 	stringView->SetExplicitAlignment(leftAlignment);
 	AddChild(stringView);
-	
+
 	AddChild(BSpaceLayoutItem::CreateVerticalStrut(spacing));
 
 	AddChild(fDPIField);
 	AddChild(fAntialiasingField);
 
 	AddChild(BSpaceLayoutItem::CreateVerticalStrut(spacing));
-	
-	BString copyrightText;
-	copyrightText << "\nBased on MuPDF " << FZ_VERSION << "\n\n"
+
+	BString copyrightText(B_TRANSLATE("Based on MuPDF %fzversion%\n\n"
 	"MuPDF is free software: you can redistribute it and/or "
-	"modify it under the terms of the Affero GNU General Pub"
-	"lic License as published by the Free Software Foundatio"
-	"n, either version 3 of the License, or (at your option)"
-	" any later version.\n\n"
-	"MuPDF is Copyright 2006-2015 Artifex Software, Inc.";
-		
+	"modify it under the terms of the Affero GNU General Public "
+	"License as published by the Free Software Foundation, "
+	"either version 3 of the License, or (at your option) "
+	"any later version.\n\n"
+	"MuPDF is Copyright 2006-2015 Artifex Software, Inc."));
+	copyrightText.ReplaceFirst("%fzversion%", FZ_VERSION);
+
 	fCopyrightView = new BTextView("CopyrightLibs");
 	fCopyrightView->SetExplicitAlignment(leftAlignment);
 	fCopyrightView->MakeEditable(false);
@@ -123,12 +129,12 @@ ConfigView::ConfigView(TranslatorSettings *settings)
 	AddChild(fCopyrightView);
 
 	fCopyrightView->SetExplicitAlignment(leftAlignment);
-	
+
 	AddChild(BSpaceLayoutItem::CreateGlue());
 	GroupLayout()->SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING, 
 		B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING);
 
-	SetExplicitPreferredSize(GroupLayout()->MinSize());		
+	SetExplicitPreferredSize(GroupLayout()->MinSize());
 }
 
 

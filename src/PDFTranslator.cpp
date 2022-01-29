@@ -22,15 +22,19 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <Catalog.h>
 #include "ConfigView.h"
 #include "PDFTranslator.h"
 #include "PDFLoader.h"
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "PDFTranslator"
 
 const char *kDocumentCount = "/documentCount";
 const char *kDocumentIndex = "/documentIndex";
 
 #define kPDFMimeType "application/pdf"
-#define kPDFName "PDF Document"
+#define kPDFName B_TRANSLATE_MARK("PDF document")
 
 static const translation_format sInputFormats[] = {
 	{
@@ -71,8 +75,8 @@ const uint32 kNumDefaultSettings = sizeof(sDefaultSettings)
 
 
 PDFTranslator::PDFTranslator()
-	: BaseTranslator("PDF Document",
-		"PDF Document translator",
+	: BaseTranslator(B_TRANSLATE("PDF document"),
+		B_TRANSLATE("PDF Document translator"),
 		PDF_TRANSLATOR_VERSION,
 		sInputFormats, kNumInputFormats,
 		sOutputFormats, kNumOutputFormats,
@@ -132,7 +136,7 @@ PDFTranslator::DerivedIdentify(BPositionIO *stream,
 		info->group = B_TRANSLATOR_BITMAP;
 		info->quality = PDF_IN_QUALITY;
 		info->capability = PDF_IN_CAPABILITY;
-		strcpy(info->name, "PDF Document");
+		strcpy(info->name, B_TRANSLATE("PDF document"));
 		strcpy(info->MIME, kPDFMimeType);
 	}
 	

@@ -32,12 +32,15 @@
 
 #include "BaseTranslator.h"
 
+#include <Catalog.h>
+
 #include <string.h>
 #include <stdio.h>
 
 #include <algorithm>
 
-#define B_TRANSLATE
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "BaseTranslator"
 
 
 // ---------------------------------------------------------------

@@ -38,7 +38,6 @@
 #include <View.h>
 #include <Window.h>
 
-#define B_TRANSLATE
 
 class TranslatorWindow : public BWindow {
 public:
