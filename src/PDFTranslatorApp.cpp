@@ -19,9 +19,14 @@
 
 
 #include <Application.h>
+#include <Catalog.h>
 
 #include "PDFTranslator.h"
 #include "TranslatorWindow.h"
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "PDFTranslatorApp"
+
 
 int
 main(int argc, char *argv[])
@@ -29,7 +34,7 @@ main(int argc, char *argv[])
 	BApplication application("application/x-vnd.Haiku-PDFTranslator");
 
 	status_t result;
-	result = LaunchTranslatorWindow(new PDFTranslator, "PDFTranslator Settings",
+	result = LaunchTranslatorWindow(new PDFTranslator, B_TRANSLATE("PDFTranslator settings"),
 		BRect(0, 0, 320, 200));
 	if (result != B_OK)
 		return 1;
