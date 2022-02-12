@@ -1,0 +1,12 @@
+1	Spanish	application/x-vnd.Haiku-PDFTranslator	3199209517
+Antialiasing bits:	ConfigView		Bits de suavizado de bordes:
+Based on MuPDF %fzversion%\n\nMuPDF is free software: you can redistribute it and/or modify it under the terms of the Affero GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.\n\nMuPDF is Copyright 2006-2015 Artifex Software, Inc.	ConfigView		Basado en MuPDF %fzversion%\n\nMuPDF es software libre: puede redistribuirlo y/o modificarlo bajo los términos de la Licencia Pública General de GNU Affero publicada por la Fundación por el Software Libre, ya sea la versión 3 de la licencia, o (a su elección) cualquier versión posterior.\n\nMuPDF es software propiedad intelectual de Artifex Software, Inc.
+DPI:	ConfigView		PPP:
+PDF image translator	ConfigView		Traductor de imagen PDF
+Be Bitmap Format	BaseTranslator		Formato de mapa de bits de Be
+Error	TranslatorWindow		Error
+OK	TranslatorWindow		Aceptar
+Unable to create the view.	TranslatorWindow		No fue posible crear la vista
+PDF document	PDFTranslator		Documento PDF
+PDF Document translator	PDFTranslator		Traductor de documento PDF
+PDFTranslator settings	PDFTranslatorApp		Ajustes del traductor de PDF
