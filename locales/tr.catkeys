@@ -1,0 +1,12 @@
+1	Turkish	application/x-vnd.Haiku-PDFTranslator	3199209517
+Antialiasing bits:	ConfigView		Kenar düzleştirme bitleri:
+Based on MuPDF %fzversion%\n\nMuPDF is free software: you can redistribute it and/or modify it under the terms of the Affero GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.\n\nMuPDF is Copyright 2006-2015 Artifex Software, Inc.	ConfigView		MuPDF %fzversion% tabanlıdır\n\nMuPDF özgür yazılımdır; Free Software Foundation tarafından yayımlanmış Affero GNU Genel Kamu Lisansı sürüm 3 veya daha yeni bir sürüm (sizin seçiminize bağlı) koşulları altında yeniden dağıtabilir ve/veya değiştirebilirsiniz.\n\nMuPDF Telif hakkı 2006-2015 Artifex Software, Inc.
+DPI:	ConfigView		DPI:
+PDF image translator	ConfigView		PDF görseli çevirmeni
+Be Bitmap Format	BaseTranslator		Be Biteşlem Biçimi
+Error	TranslatorWindow		Hata
+OK	TranslatorWindow		Tamam
+Unable to create the view.	TranslatorWindow		Görünüm oluşturulamıyor.
+PDF document	PDFTranslator		PDF belgesi
+PDF Document translator	PDFTranslator		PDF belgesi çevirmeni
+PDFTranslator settings	PDFTranslatorApp		PDFTranslator ayarları
