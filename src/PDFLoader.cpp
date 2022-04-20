@@ -25,7 +25,7 @@ struct istream_filter {
     unsigned char buf[4096];
 };
 
-static int next_istream(fz_context *ctx, fz_stream *stm, int max)
+static int next_istream(fz_context *ctx, fz_stream *stm, size_t max)
 {
     istream_filter *state = (istream_filter *)stm->state;
     int cbRead = sizeof(state->buf);        
@@ -40,7 +40,7 @@ static int next_istream(fz_context *ctx, fz_stream *stm, int max)
     return cbRead > 0 ? *stm->rp++ : EOF;
 }
 
-static void seek_istream(fz_context *ctx, fz_stream *stm, int offset, int whence)
+static void seek_istream(fz_context *ctx, fz_stream *stm, int64_t offset, int whence)
 {
     istream_filter *state = (istream_filter *)stm->state;
     state->stream->Seek(offset, whence);
@@ -55,34 +55,6 @@ static void close_istream(fz_context *ctx, void *state_)
     state->stream->Seek(0, SEEK_END);
     fz_free(ctx, state);
 }
-/*
-static fz_stream *
-stream_rebind(fz_stream *s)
-{
-	return s;
-}
-*/
-static int
-stream_meta(fz_stream *stream, int key, int size, void *ptr)
-{
-    BPositionIO *source = (BPositionIO*)(stream->state);
-
-    switch(key)
-    {
-	    case FZ_STREAM_META_LENGTH:
-	    {
-			size_t pos = source->Position();
-			source->Seek(0, SEEK_END);
-			size_t iosize = source->Position();
-			source->Seek(pos, SEEK_SET);
-			return iosize;
-	    }
-	    case FZ_STREAM_META_PROGRESSIVE:
-	        return 1;
-	    }
-    return -1;
-}
-
 
 PDFLoader::PDFLoader(BPositionIO *source)
 {
@@ -117,7 +89,6 @@ PDFLoader::PDFLoader(BPositionIO *source)
     fz_register_document_handlers(ctx);
     
     stream->seek = seek_istream;
-    //stream->meta = stream_meta;
         
 	if (signatureData == kPDFMagic) {
 		fDocumentType = PDF_IMAGE_FORMAT;
@@ -188,25 +159,24 @@ PDFLoader::GetImage(BPositionIO *target, int index)
 
 	fz_page *page = fz_load_page(ctx, doc, index - 1);
 	
-	fz_matrix transform;
-	fz_rotate(&transform, rotation);
-	fz_pre_scale(&transform, fDPI / 72.0f, fDPI / 72.0f);
+	fz_matrix transform = fz_rotate(rotation);
+	fz_pre_scale(transform, fDPI / 72.0f, fDPI / 72.0f);
 	
 	fz_set_aa_level(ctx, fAntialiasingBits);
 
-	fz_rect bounds;
-	fz_bound_page(ctx, page, &bounds);
-	fz_transform_rect(&bounds, &transform);
+	fz_rect bounds = fz_bound_page(ctx, page);
+	fz_transform_rect(bounds, transform);
 
-	fz_irect bbox;
-	fz_round_rect(&bbox, &bounds);
-	fz_pixmap *pix = fz_new_pixmap_with_bbox(ctx, fz_device_rgb(ctx), &bbox);
+	fz_irect bbox =	fz_round_rect(bounds);
+    fz_separations *seps = fz_page_separations(ctx, page);
+	fz_pixmap *pix = fz_new_pixmap_with_bbox(ctx, fz_device_rgb(ctx), bbox, seps, 1);
 	fz_clear_pixmap_with_value(ctx, pix, 0xff);
 
-	fz_device *dev = fz_new_draw_device(ctx, pix);
+    fz_matrix mat = fz_scale(1, 1);
+	fz_device *dev = fz_new_draw_device(ctx, mat, pix);
 	if (fAntialiasingBits == 0)
 		fz_enable_device_hints(ctx, dev, FZ_DONT_INTERPOLATE_IMAGES);
-	fz_run_page(ctx, page, dev, &transform, NULL);
+	fz_run_page(ctx, page, dev, transform, NULL);
 	fz_drop_device(ctx, dev);
 
 	TranslatorBitmap bitsHeader;
