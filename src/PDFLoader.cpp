@@ -172,8 +172,7 @@ PDFLoader::GetImage(BPositionIO *target, int index)
 	fz_pixmap *pix = fz_new_pixmap_with_bbox(ctx, fz_device_rgb(ctx), bbox, seps, 1);
 	fz_clear_pixmap_with_value(ctx, pix, 0xff);
 
-	fz_matrix mat = fz_scale(1, 1);
-	fz_device *dev = fz_new_draw_device(ctx, mat, pix);
+	fz_device *dev = fz_new_draw_device(ctx, fz_identity, pix);
 	if (fAntialiasingBits == 0)
 		fz_enable_device_hints(ctx, dev, FZ_DONT_INTERPOLATE_IMAGES);
 	fz_run_page(ctx, page, dev, transform, NULL);
